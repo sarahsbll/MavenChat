@@ -31,6 +31,17 @@ public class ServerDispatcher extends Thread {
 	private KeyStore myKeyStore;
 	private String myAlias;
 
+	int numberOfClients = 2;
+	int threshold = 2;
+
+	// partition according to client number
+	final Scheme scheme = new Scheme(new SecureRandom(), numberOfClients, threshold);
+
+	Set<String> receivedSK = new HashSet<String>();
+	Map<Integer, byte[]> partsSK;
+
+	byte[] recoveredPrivateKey = null;
+
 	private static Vector<String> mMessageQueue = new Vector<String>();
 	private static HashMap<String, ClientInfo> mClients = new HashMap<String, ClientInfo>(); // Hashmap <alias,
 																								// ClientInfo>
@@ -90,21 +101,18 @@ public class ServerDispatcher extends Thread {
 	}
 
 	// 2nd mod
-	private synchronized void distributeKey(String privateKey) {
+	private synchronized Map<Integer, byte[]> distributeKey(String privateKey) {
 
-		// find size of mClient.entrySet
-		int numberOfClients = 2;
-
-		// partition according to client number
-		final Scheme scheme = new Scheme(new SecureRandom(), numberOfClients, 2);
 		final byte[] secret = privateKey.getBytes(StandardCharsets.UTF_8);
 		final Map<Integer, byte[]> parts = scheme.split(secret);
 
+		int clients = 1;
 		for (Map.Entry<String, ClientInfo> entry : mClients.entrySet()) {
 			ClientInfo clientInfo = entry.getValue();
-			clientInfo.mClientSender.sendMessage(parts.get(numberOfClients).toString());
-			numberOfClients = numberOfClients - 1;
+			clientInfo.mClientSender.sendMessage(parts.get(clients).toString());
+			clients++;
 		}
+		return parts;
 	}
 
 	/**
@@ -154,11 +162,12 @@ public class ServerDispatcher extends Thread {
 			// 3rd mod
 			if (mClients.size() == 2) {
 				String privateKey = "hush";
-				distributeKey(privateKey);
+				partsSK = distributeKey(privateKey);
 			}
 
 		} else if (message.contains("B")) {
 			// 4th mod
+			receivedSK.add(message);
 			System.out.println("\t(Received shared key: " + message + ")");
 
 		} else {
@@ -180,6 +189,13 @@ public class ServerDispatcher extends Thread {
 
 				String message = getNextMessageFromQueue();
 				sendMessageToClients(message);
+
+				if (receivedSK.size() == 2) {
+					recoveredPrivateKey = scheme.join(partsSK);
+					System.out.println("Success yes");
+
+					System.out.println(new String(recoveredPrivateKey, StandardCharsets.UTF_8));
+				}
 			}
 		} catch (InterruptedException e) {
 			System.err.print(e);
