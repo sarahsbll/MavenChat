@@ -163,18 +163,8 @@ public class ServerDispatcher extends Thread {
 		} else if (message.contains("init")) {
 			// 3rd mod
 			if (mClients.size() == 2) {
-				// String privateKey = myKey.key_private.toString();
-				String privateKey;
-				try {
-					privateKey = Help.getPublicK(myKeyStore, myAlias);
-
-					System.out.println("Secret to share : ");
-					System.out.println(privateKey);
-					partsSK = distributeKey(privateKey);
-
-				} catch (Exception fail) {
-					throw new ErrorException(":fail CERTIFICATES VERIFICATION BY ALIAS FAILED!\n");
-				}
+				String privateKey = Help.getPrivateK(myKeyStore, myAlias);
+				partsSK = distributeKey(privateKey);
 			}
 
 		} else if (message.contains("B")) {
@@ -200,22 +190,20 @@ public class ServerDispatcher extends Thread {
 			while (true) {
 
 				String message = getNextMessageFromQueue();
-				try {
-					sendMessageToClients(message);
-				} catch (ErrorException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
+				sendMessageToClients(message);
 
 				if (receivedSK.size() == 2) {
 					recoveredPrivateKey = scheme.join(partsSK);
-					System.out.println("Recovered secret : ");
+					System.out.println("Success");
 
 					System.out.println(new String(recoveredPrivateKey, StandardCharsets.UTF_8));
 				}
 			}
 		} catch (InterruptedException e) {
 			System.err.print(e);
+		} catch (ErrorException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 	}
 

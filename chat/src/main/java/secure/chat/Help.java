@@ -130,7 +130,7 @@ public class Help {
 	 */
 	public static void greeting(String alias) {
 		System.out.println("*******************************************************************************");
-		System.out.println("\t\t Party" + " Connected Successfully");
+		System.out.println("\t\t Party" + alias + " Connected Successfully ");
 		System.out.println("\t1. Type \"init\" to initiate secret sharing");
 		System.out.println("\t2. Type \"send\" to recover original secret");
 		System.out.println("*******************************************************************************");
@@ -140,7 +140,7 @@ public class Help {
 	 * display ending message
 	 */
 	public static void ending(String alias) {
-		System.out.println("\n************ Disconnected " + alias + " ************\n");
+		System.out.println("\n************ Disconnected  ************\n");
 	}
 
 	/**
@@ -163,6 +163,19 @@ public class Help {
 
 	}
 
+	public static String getPrivateK(KeyStore ks, String alias) throws ErrorException {
+		String privk = null;
+		char[] pass = ("password").toCharArray();
+
+		try {
+			privk = ks.getKey(alias, pass).toString();
+		} catch (UnrecoverableKeyException | KeyStoreException | NoSuchAlgorithmException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return privk;
+	}
+
 	/**
 	 * get the based64 encoded byte[] certificate
 	 * 
@@ -176,19 +189,6 @@ public class Help {
 		} catch (Exception fail) {
 			throw new ErrorException(":fail GET CERTIFICATE FOR ALIAS " + alias + " FAILED!\n");
 		}
-	}
-
-	public static String getPublicK(KeyStore ks, String alias) throws ErrorException {
-		String pubk = null;
-		try {
-			pubk = ks.getCertificate(alias).getPublicKey().toString();
-			return pubk;
-		} catch (KeyStoreException fail) {
-			throw new ErrorException(":fail GET CERTIFICATE FROM KEYSTORE BY ALIAS FAILED!\n");
-		} catch (Exception fail) {
-			throw new ErrorException(":fail CERTIFICATES VERIFICATION BY ALIAS FAILED!\n");
-		}
-
 	}
 
 	/**
