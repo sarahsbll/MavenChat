@@ -31,8 +31,6 @@ public class ServerDispatcher extends Thread {
 	private KeyStore myKeyStore;
 	private String myAlias;
 
-	private String pwd;
-
 	int numberOfClients = 2;
 	int threshold = 2;
 
@@ -160,10 +158,12 @@ public class ServerDispatcher extends Thread {
 				ClientInfo sender = mClients.get(senderAlias);
 				sender.mClientSender.sendMessage(feedback);
 			}
-		} else if (message.contains("req")) {
+		} else if (message.contains("init")) {
 			// 3rd mod
 			if (mClients.size() == 2) {
-				String privateKey = pwd;
+				System.out.println("Secret to share : ");
+				String privateKey = myKey.key_private.toString();
+				System.out.println(privateKey);
 				partsSK = distributeKey(privateKey);
 			}
 
@@ -194,8 +194,7 @@ public class ServerDispatcher extends Thread {
 
 				if (receivedSK.size() == 2) {
 					recoveredPrivateKey = scheme.join(partsSK);
-					System.out.println("Success yes");
-
+					System.out.println("Recovered secret : ");
 					System.out.println(new String(recoveredPrivateKey, StandardCharsets.UTF_8));
 				}
 			}
@@ -389,8 +388,6 @@ public class ServerDispatcher extends Thread {
 	 */
 	public void getMyKeyStore(String keystoreFileName, String password) throws ErrorException {
 		// initialize myAlias from the key store name (alias.jks)
-		pwd = password;
-
 		String[] temp = keystoreFileName.split("\\.");
 		myAlias = temp[0];
 

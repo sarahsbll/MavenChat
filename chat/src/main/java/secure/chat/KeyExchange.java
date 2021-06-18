@@ -5,7 +5,7 @@ import java.security.spec.*;
 import javax.crypto.KeyAgreement;
 
 public class KeyExchange {
-	private static PrivateKey key_private;
+	public static PrivateKey key_private;
 	private static PublicKey key_public;
 	private static byte[] key_secret;
 	private String keyEstAlgor; // key establish algorithm
