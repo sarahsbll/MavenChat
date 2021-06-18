@@ -31,6 +31,8 @@ public class ServerDispatcher extends Thread {
 	private KeyStore myKeyStore;
 	private String myAlias;
 
+	private String pwd;
+
 	int numberOfClients = 2;
 	int threshold = 2;
 
@@ -120,14 +122,9 @@ public class ServerDispatcher extends Thread {
 	 * is added to the client sender thread's message queue and this client sender
 	 * thread is notified.
 	 * 
-	 * @throws NoSuchAlgorithmException
-	 * @throws UnrecoverableEntryException
-	 * @throws KeyStoreException
-	 * 
 	 * @throws InterruptedException
 	 */
-	private synchronized void sendMessageToClients(String message)
-			throws KeyStoreException, UnrecoverableEntryException, NoSuchAlgorithmException {
+	private synchronized void sendMessageToClients(String message) {
 
 		// move this
 		String[] getSender = message.split("/");
@@ -166,10 +163,7 @@ public class ServerDispatcher extends Thread {
 		} else if (message.contains("req")) {
 			// 3rd mod
 			if (mClients.size() == 2) {
-				// String privateKey = "hush";
-				String privateKey;
-				privateKey = Help.getPrivKey(myKeyStore, myAlias);
-
+				String privateKey = pwd;
 				partsSK = distributeKey(privateKey);
 			}
 
@@ -207,15 +201,6 @@ public class ServerDispatcher extends Thread {
 			}
 		} catch (InterruptedException e) {
 			System.err.print(e);
-		} catch (KeyStoreException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (UnrecoverableEntryException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (NoSuchAlgorithmException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
 		}
 	}
 
@@ -404,6 +389,8 @@ public class ServerDispatcher extends Thread {
 	 */
 	public void getMyKeyStore(String keystoreFileName, String password) throws ErrorException {
 		// initialize myAlias from the key store name (alias.jks)
+		pwd = password;
+
 		String[] temp = keystoreFileName.split("\\.");
 		myAlias = temp[0];
 

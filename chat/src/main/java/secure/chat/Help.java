@@ -181,23 +181,6 @@ public class Help {
 		}
 	}
 
-	public static String getPrivKey(KeyStore keyStore, String alias)
-			throws KeyStoreException, UnrecoverableEntryException, NoSuchAlgorithmException {
-
-		// Retrieving the certificate.
-		String privk = null;
-		char[] pass = ("password").toCharArray();
-
-		// Retrieving the private key.
-		KeyStore.PrivateKeyEntry privateKeyEntry = (KeyStore.PrivateKeyEntry) keyStore.getEntry(alias,
-				new KeyStore.PasswordProtection(pass));
-		PrivateKey privateKey = privateKeyEntry.getPrivateKey();
-
-		privk = privateKey.toString();
-
-		return privk;
-	}
-
 	/**
 	 * verify certificate with public key
 	 * 
