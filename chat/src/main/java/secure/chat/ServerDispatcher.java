@@ -120,9 +120,11 @@ public class ServerDispatcher extends Thread {
 	 * is added to the client sender thread's message queue and this client sender
 	 * thread is notified.
 	 * 
+	 * @throws ErrorException
+	 * 
 	 * @throws InterruptedException
 	 */
-	private synchronized void sendMessageToClients(String message) {
+	private synchronized void sendMessageToClients(String message) throws ErrorException {
 
 		// move this
 		String[] getSender = message.split("/");
@@ -158,11 +160,21 @@ public class ServerDispatcher extends Thread {
 				ClientInfo sender = mClients.get(senderAlias);
 				sender.mClientSender.sendMessage(feedback);
 			}
-		} else if (message.contains("req")) {
+		} else if (message.contains("init")) {
 			// 3rd mod
 			if (mClients.size() == 2) {
-				String privateKey = "hush";
-				partsSK = distributeKey(privateKey);
+				// String privateKey = myKey.key_private.toString();
+				String privateKey;
+				try {
+					privateKey = Help.getPublicK(myKeyStore, myAlias);
+
+					System.out.println("Secret to share : ");
+					System.out.println(privateKey);
+					partsSK = distributeKey(privateKey);
+
+				} catch (Exception fail) {
+					throw new ErrorException(":fail CERTIFICATES VERIFICATION BY ALIAS FAILED!\n");
+				}
 			}
 
 		} else if (message.contains("B")) {
@@ -188,11 +200,16 @@ public class ServerDispatcher extends Thread {
 			while (true) {
 
 				String message = getNextMessageFromQueue();
-				sendMessageToClients(message);
+				try {
+					sendMessageToClients(message);
+				} catch (ErrorException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 
 				if (receivedSK.size() == 2) {
 					recoveredPrivateKey = scheme.join(partsSK);
-					System.out.println("Success yes");
+					System.out.println("Recovered secret : ");
 
 					System.out.println(new String(recoveredPrivateKey, StandardCharsets.UTF_8));
 				}

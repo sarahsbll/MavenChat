@@ -5,7 +5,7 @@ import java.security.spec.*;
 import javax.crypto.KeyAgreement;
 
 public class KeyExchange {
-	private static PrivateKey key_private;
+	public static PrivateKey key_private;
 	private static PublicKey key_public;
 	private static byte[] key_secret;
 	private String keyEstAlgor; // key establish algorithm
@@ -34,7 +34,6 @@ public class KeyExchange {
 			key_private = key_pair.getPrivate();
 			key_public = key_pair.getPublic();
 			System.out.println("Public key: " + key_public.toString());
-
 		} catch (Exception e) {
 			throw new ErrorException(":fail FAILED TO MAKE KEYEXCHANGE OBJECT\n");
 		}

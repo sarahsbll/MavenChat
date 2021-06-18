@@ -130,12 +130,9 @@ public class Help {
 	 */
 	public static void greeting(String alias) {
 		System.out.println("*******************************************************************************");
-		System.out.println("\t\tHi " + alias + "! Welcome to the Chat Hub! ");
-		System.out.println("\t1. Type \"To alias: message\" to send message (LETTERCASE OF ALIAS MATTERS!)");
-		System.out.println("\t   - Exp: To bob: Hi How are you? (message will be sent to alice)  ");
-		System.out.println("\t2. Type \"To all: message\" to talk to all (LETTERCASE OF ALL DOES NOT MATTER)");
-		System.out.println("\t   - Exp: To all: Hi How are you? (message will be sent to everyone in the chat hub) ");
-		System.out.println("\t3. When finish chatting, enter \"exit\" to exit the chat hub    ");
+		System.out.println("\t\t Party" + " Connected Successfully");
+		System.out.println("\t1. Type \"init\" to initiate secret sharing");
+		System.out.println("\t2. Type \"send\" to recover original secret");
 		System.out.println("*******************************************************************************");
 	}
 
@@ -143,7 +140,7 @@ public class Help {
 	 * display ending message
 	 */
 	public static void ending(String alias) {
-		System.out.println("\n************ Bye " + alias + "! Thanks for chatting! ************\n");
+		System.out.println("\n************ Disconnected " + alias + " ************\n");
 	}
 
 	/**
@@ -179,6 +176,19 @@ public class Help {
 		} catch (Exception fail) {
 			throw new ErrorException(":fail GET CERTIFICATE FOR ALIAS " + alias + " FAILED!\n");
 		}
+	}
+
+	public static String getPublicK(KeyStore ks, String alias) throws ErrorException {
+		String pubk = null;
+		try {
+			pubk = ks.getCertificate(alias).getPublicKey().toString();
+			return pubk;
+		} catch (KeyStoreException fail) {
+			throw new ErrorException(":fail GET CERTIFICATE FROM KEYSTORE BY ALIAS FAILED!\n");
+		} catch (Exception fail) {
+			throw new ErrorException(":fail CERTIFICATES VERIFICATION BY ALIAS FAILED!\n");
+		}
+
 	}
 
 	/**
