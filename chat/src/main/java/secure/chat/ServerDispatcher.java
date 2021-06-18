@@ -120,11 +120,14 @@ public class ServerDispatcher extends Thread {
 	 * is added to the client sender thread's message queue and this client sender
 	 * thread is notified.
 	 * 
-	 * @throws ErrorException
+	 * @throws NoSuchAlgorithmException
+	 * @throws UnrecoverableEntryException
+	 * @throws KeyStoreException
 	 * 
 	 * @throws InterruptedException
 	 */
-	private synchronized void sendMessageToClients(String message) throws ErrorException {
+	private synchronized void sendMessageToClients(String message)
+			throws KeyStoreException, UnrecoverableEntryException, NoSuchAlgorithmException {
 
 		// move this
 		String[] getSender = message.split("/");
@@ -160,10 +163,13 @@ public class ServerDispatcher extends Thread {
 				ClientInfo sender = mClients.get(senderAlias);
 				sender.mClientSender.sendMessage(feedback);
 			}
-		} else if (message.contains("init")) {
+		} else if (message.contains("req")) {
 			// 3rd mod
 			if (mClients.size() == 2) {
-				String privateKey = Help.getPrivateK(myKeyStore, myAlias);
+				// String privateKey = "hush";
+				String privateKey;
+				privateKey = Help.getPrivKey(myKeyStore, myAlias);
+
 				partsSK = distributeKey(privateKey);
 			}
 
@@ -194,14 +200,20 @@ public class ServerDispatcher extends Thread {
 
 				if (receivedSK.size() == 2) {
 					recoveredPrivateKey = scheme.join(partsSK);
-					System.out.println("Success");
+					System.out.println("Success yes");
 
 					System.out.println(new String(recoveredPrivateKey, StandardCharsets.UTF_8));
 				}
 			}
 		} catch (InterruptedException e) {
 			System.err.print(e);
-		} catch (ErrorException e) {
+		} catch (KeyStoreException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (UnrecoverableEntryException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (NoSuchAlgorithmException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}

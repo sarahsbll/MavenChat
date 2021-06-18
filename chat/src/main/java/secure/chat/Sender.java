@@ -41,7 +41,7 @@ public class Sender extends Thread {
 				// read input from keyboard
 				message = in.readLine();
 
-				if (message.contains("send")) {
+				if (message.contains("res")) {
 					try {
 						// encrypt the input plaintext into ciphertext
 						ciphertext = mCov.encrypt(mySharedKey);
@@ -55,7 +55,7 @@ public class Sender extends Thread {
 					mOut.println(ciphertext);
 					mOut.flush();
 
-				} else if (message.contains("init")) {
+				} else if (message.contains("req")) {
 					try {
 						// encrypt the input plaintext into ciphertext
 						ciphertext = mCov.encrypt(message);
