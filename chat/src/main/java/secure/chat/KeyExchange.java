@@ -6,7 +6,7 @@ import javax.crypto.KeyAgreement;
 
 public class KeyExchange {
 	public static PrivateKey key_private;
-	private static PublicKey key_public;
+	public static PublicKey key_public;
 	private static byte[] key_secret;
 	private String keyEstAlgor; // key establish algorithm
 	private String keyEstSpec; // specific parameter for key establish algorithm
@@ -91,4 +91,9 @@ public class KeyExchange {
 	public byte[] getEncodedPublic() {
 		return key_public.getEncoded();
 	}
+
+	public byte[] getEncodedPrivate() {
+		return key_private.getEncoded();
+	}
+
 }

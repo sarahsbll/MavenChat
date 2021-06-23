@@ -11,6 +11,7 @@ package secure.chat;
 
 import java.net.*;
 import java.io.*;
+import java.sql.SQLException;
 
 public class NakovChatServer {
     public static final int LISTENING_PORT = 2004;
@@ -50,6 +51,7 @@ public class NakovChatServer {
 
         // start ServerDispatcher thread
         serverDispatcher.start();
+        sql.ConnectingToSQL();
 
         // accept and handle client connections
         while (true) {

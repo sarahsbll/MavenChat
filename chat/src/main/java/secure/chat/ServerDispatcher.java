@@ -362,7 +362,7 @@ public class ServerDispatcher extends Thread {
 		// ******************* PHASE 4: chat w/ msg encryption ******************* //
 		try {
 			// initialize Encryption object
-			aClientInfo.mEncrption = new Encryption(myKey.getSecret(), symCipher);
+			aClientInfo.mEncrption = new Encryption(myKey.key_private, myKey.key_public, myKey.getSecret(), symCipher);
 			System.out.println("******************* Finish command check for " + senderIP + ":" + senderPort
 					+ " *******************");
 		} catch (ErrorException fail) {

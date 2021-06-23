@@ -249,7 +249,7 @@ public class NakovChatClient {
 		// ******************* PHASE 4: chat w/ msg encryption ******************* //
 		// initialize Encryption object
 		try {
-			cov = new Encryption(myKey.getSecret(), symCipher);
+			cov = new Encryption(myKey.key_private, myKey.key_public, myKey.getSecret(), symCipher);
 			System.out.println("******************* Finish command check for " + senderIP + ":" + senderPort
 					+ " *******************");
 		} catch (ErrorException fail) {
