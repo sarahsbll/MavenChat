@@ -161,16 +161,31 @@ public class ServerDispatcher extends Thread {
 		} else if (message.contains("init")) {
 			// 3rd mod
 			if (mClients.size() == 2) {
-				System.out.println("Secret to share : ");
+				System.out.println("Secret à partager : ");
 				String privateKey = myKey.key_private.toString();
 				System.out.println(privateKey);
 				partsSK = distributeKey(privateKey);
+
+				ArrayList<HashMap[]> popol;
+
+				popol = Decompte.compteVote();
+
+				System.out.println("Listes electorales pré-Depouillement : ");
+				for (int i = 0; i < 5; i++) {
+					System.out.println("Wilaya " + i);
+					for (int j = 0; j < 5; j++) {
+						System.out.println("Liste  " + j + " | " + popol.get(i)[j]);
+					}
+					System.out.println("------------------------------");
+				}
+				System.out.println("||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||");
+
 			}
 
 		} else if (message.contains("B")) {
 			// 4th mod
 			receivedSK.add(message);
-			System.out.println("\t(Received shared key: " + message + ")");
+			System.out.println("\t(Partage de clé reçu : " + message + ")");
 
 		} else {
 			// message in wrong format, send back to sender
@@ -193,9 +208,39 @@ public class ServerDispatcher extends Thread {
 				sendMessageToClients(message);
 
 				if (receivedSK.size() == 2) {
+					// Reconstruct Secret
 					recoveredPrivateKey = scheme.join(partsSK);
-					System.out.println("Recovered secret : ");
+					System.out.println("Secret Reconstruit : ");
 					System.out.println(new String(recoveredPrivateKey, StandardCharsets.UTF_8));
+
+					// Procede to Tally
+					/*
+					 * On a ici 5 wilaya ayant chacune 5 listes electorales (donc 5 partis, chaque
+					 * parti possède une liste pour chaque wilaya), Nous avons donc 5 liste par
+					 * wilaya contenant chacune 3 candidats ce qui nous fait un total de 75
+					 * candidats (5wilaya * 5listes * 3candidat)
+					 */
+					int[] voteListe;
+					ArrayList<HashMap[]> popol;
+
+					popol = Decompte.compteVote();
+
+					// You could also decrypt at this point, by writing over the votes with
+					// decrypted values after selecing them
+					popol = Decompte.Depouillement();
+
+					System.out.println("Listes electorales post-Depouillement : ");
+					for (int i = 0; i < 5; i++) {
+						System.out.println("Wilaya " + i);
+						for (int j = 0; j < 5; j++) {
+							System.out.println("Liste  " + j + " | " + popol.get(i)[j]);
+						}
+						System.out.println("------------------------------");
+					}
+					System.out.println("||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||");
+
+					voteListe = Decompte.UpdateNbvoteListe(popol);
+					Decompte.AssignerSiege(voteListe, popol);
 				}
 			}
 		} catch (InterruptedException e) {

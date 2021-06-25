@@ -3,46 +3,7 @@ package secure.chat;
 import java.sql.*;
 import java.util.*;
 
-public class bb {
-    public static void main(String[] args) {
-        /*
-         * On a ici 5 wilaya ayant chacune 5 listes electorales (donc 5 partis, chaque
-         * parti possède une liste pour chaque wilaya), Nous avons donc 5 liste par
-         * wilaya contenant chacune 3 candidats ce qui nous fait un total de 75
-         * candidats (5wilaya * 5listes * 3candidat)
-         */
-        int[] voteListe;
-        ArrayList<HashMap[]> popol;
-
-        popol = compteVote();
-
-        System.out.println("Listes electorales pré-Depouillement");
-        for (int i = 0; i < 5; i++) {
-            System.out.println("Wilaya " + i);
-            for (int j = 0; j < 5; j++) {
-                System.out.println("Liste  " + j + " | " + popol.get(i)[j]);
-            }
-            System.out.println("------------------------------");
-        }
-        System.out.println("||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||");
-
-        // You could also decrypt at this point, by writing over the votes with
-        // decrypted values after selecing them
-        popol = Depouillement();
-
-        System.out.println("Listes electorales post-Depouillement");
-        for (int i = 0; i < 5; i++) {
-            System.out.println("Wilaya " + i);
-            for (int j = 0; j < 5; j++) {
-                System.out.println("Liste  " + j + " | " + popol.get(i)[j]);
-            }
-            System.out.println("------------------------------");
-        }
-        System.out.println("||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||");
-
-        voteListe = UpdateNbvoteListe(popol);
-        AssignerSiege(voteListe, popol);
-    }
+public class Decompte {
 
     public static ArrayList<HashMap[]> compteVote() {
         /*
