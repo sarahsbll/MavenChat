@@ -19,7 +19,7 @@ public class NakovChatClient {
 	private static Socket socket;
 	private static BufferedReader mIn = null;
 	private static PrintWriter mOut = null;
-	private static String myCipherSuite = "ecdh-secp224r1+X.509+AES_128/GCM/NoPadding//ecdh-secp256r1+x.509+AES_128/GCM/NoPadding"; // used
+	private static String myCipherSuite = "ecdh-secp521r1+X.509+AES_128/GCM/NoPadding//ecdh-secp521r1+x.509+AES_128/GCM/NoPadding"; // used
 																																	// AES/GCM
 	// private static String myCipherSuite =
 	// "ecdh-secp224r1+X.509+AES/CBC/PKCS5Padding//ecdh-secp256r1+x.509+AES/CBC/PKCS5Padding";
@@ -249,7 +249,7 @@ public class NakovChatClient {
 		// ******************* PHASE 4: chat w/ msg encryption ******************* //
 		// initialize Encryption object
 		try {
-			cov = new Encryption(myKey.key_private, myKey.key_public, myKey.getSecret(), symCipher);
+			cov = new Encryption(myKey.getSecret(), symCipher);
 			System.out.println("******************* Finish command check for " + senderIP + ":" + senderPort
 					+ " *******************");
 		} catch (ErrorException fail) {
