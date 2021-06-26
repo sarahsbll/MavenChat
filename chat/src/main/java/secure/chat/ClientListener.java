@@ -9,9 +9,12 @@ package secure.chat;
 import java.io.*;
 import java.net.*;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 public class ClientListener extends Thread {
     private ServerDispatcher mServerDispatcher;
-    private ClientInfo mClientInfo;
+    public ClientInfo mClientInfo;
     private BufferedReader mIn;
 
     public ClientListener(ClientInfo aClientInfo, ServerDispatcher aServerDispatcher) throws IOException {
@@ -35,6 +38,29 @@ public class ClientListener extends Thread {
                     ciphertext = mIn.readLine();
                     message = mClientInfo.mEncrption.decrypt(ciphertext);
                     System.out.println(message);
+                    if (message.contains("vote")) {
+                        // decrypt vote & send it to DecryptVote which gets called by serverdispatcher
+                        String pin;
+                        String voteC;
+                        String voteaD;
+                        String voteD;
+
+                        pin = message.substring(9, 73);
+
+                        String pattern = "(\\s)(.*)";
+
+                        // Create a Pattern object
+                        Pattern r = Pattern.compile(pattern);
+
+                        // Now create matcher object.
+                        Matcher m = r.matcher(message.substring(73, message.length()));
+                        if (m.find()) {
+                            voteC = m.group(0);
+                            voteaD = voteC.substring(1, voteC.length());
+                            voteD = mClientInfo.mEncrption.decrypt(voteaD);
+                            DecryptVote.setVoteD(voteD);
+                        }
+                    }
                     System.out.println("\t(Decrypted from cipher text: " + ciphertext + ")");
                 } catch (ErrorException err) {
                     mClientInfo.mClientSender.interrupt();

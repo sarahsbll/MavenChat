@@ -1,5 +1,8 @@
 package secure.chat;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 /**
  * Nakov Chat Client
  * (c) Svetlin Nakov, 2002
@@ -35,7 +38,8 @@ public class Sender extends Thread {
 		String message = null;
 		String ciphertext = null;
 		try {
-			Help.greeting(mAlias);
+			Help.prevote(mAlias);
+
 			BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
 			while (!isInterrupted()) {
 				// read input from keyboard
@@ -51,6 +55,55 @@ public class Sender extends Thread {
 						System.exit(-1);
 					}
 
+					// send the ciphertext to chat server through the socket
+					mOut.println(ciphertext);
+					mOut.flush();
+				} else if (message.contains("nin")) {
+					try {
+						// encrypt the input plaintext into ciphertext
+						ciphertext = mCov.encrypt(message);
+						System.out.println("\t(Encrypted into cipher text: " + ciphertext + ")");
+					} catch (ErrorException fail) {
+						System.err.println(fail);
+						System.exit(-1);
+					}
+					// send the ciphertext to chat server through the socket
+					mOut.println(ciphertext);
+					mOut.flush();
+
+				} else if (message.contains("bulletin")) {
+					try {
+						String pin;
+						String vote = "";
+						String voteC;
+						String bulletin = "";
+
+						System.out.println("PIN :");
+						pin = message.substring(11, 75);
+						System.out.println(pin); // length of PIN is 65
+						System.out.println("Candidat :");
+						String pattern = "(\\d+)";
+
+						// Create a Pattern object
+						Pattern r = Pattern.compile(pattern);
+
+						// Now create matcher object.
+						Matcher m = r.matcher(message.substring(76, message.length()));
+						if (m.find()) {
+							vote = m.group(0);
+							System.out.println(vote);
+							voteC = mCov.encrypt(vote);
+							System.out.println("Vote chiffré :");
+							System.out.println(voteC);
+							bulletin = "bulletin " + pin + " " + voteC;
+							ciphertext = mCov.encrypt(bulletin);
+						}
+						// encrypt the input plaintext into ciphertext
+						System.out.println("\t(Encrypted into cipher text: " + ciphertext + ")");
+					} catch (ErrorException fail) {
+						System.err.println(fail);
+						System.exit(-1);
+					}
 					// send the ciphertext to chat server through the socket
 					mOut.println(ciphertext);
 					mOut.flush();
