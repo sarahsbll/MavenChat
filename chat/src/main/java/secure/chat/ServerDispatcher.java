@@ -139,38 +139,54 @@ public class ServerDispatcher extends Thread {
 			System.out.println("NIN :");
 			nin = message.substring(11, 29);
 			System.out.println(nin);
+
 			System.out.println("PIN :");
-			pin = message.substring(30, 95);
+			pin = message.substring(30, 94);
 			System.out.println(pin); // length of PIN is 65
-			System.out.println("Vote chiffré :");
-			String pattern = "(\\s)(.*)";
+			// NIN Verification
 
-			// Create a Pattern object
-			Pattern r = Pattern.compile(pattern);
+			try {
+				Class.forName("com.mysql.jdbc.Driver");
+				Connection con = DriverManager.getConnection(
+						"jdbc:mysql://localhost:3306/dbvote2?autoReconnect=true&useSSL=false", "root", "projetcrypto");
+				Statement stmt = con.createStatement();
+				ResultSet rs;
+				String query;
 
-			// Now create matcher object.
-			Matcher m = r.matcher(message.substring(95, message.length()));
-			if (m.find()) {
-				voteC = m.group(0);
-				System.out.println(voteC.substring(1, voteC.length()));
-				try {
-					Class.forName("com.mysql.jdbc.Driver");
-					Connection con = DriverManager.getConnection(
-							"jdbc:mysql://localhost:3306/dbvote2?autoReconnect=true&useSSL=false", "root",
-							"projetcrypto");
-					String query;
-					PreparedStatement preparedstmt;
-					query = " insert into bulletin2 (PIN, Vote)" + " values (?, ?)";
-					preparedstmt = con.prepareStatement(query);
-					preparedstmt.setString(1, pin);
-					preparedstmt.setString(2, voteC.substring(1, voteC.length()));
-					preparedstmt.executeUpdate();
-					System.out.println("Le bulletin a été ajouté");
-				} catch (Exception e) {
-					System.out.println(e);
+				query = "select electeur.NIN, bulletin2.PIN from electeur left join bulletin2 on electeur.id = bulletin2.id;";
+				rs = stmt.executeQuery(query);
+				while (rs.next()) {
+					String NIN = (rs.getString("NIN"));
+					System.out.println(NIN);
+					String PIN = (rs.getString("PIN"));
+					System.out.println(PIN);
+					if (nin.equals(NIN)) {
+						if (pin.equals(PIN)) {
+							System.out.println("Vote chiffré :");
+							String pattern = "(\\s)(.*)";
+
+							// Create a Pattern object
+							Pattern r = Pattern.compile(pattern);
+
+							// Now create matcher object.
+							Matcher m = r.matcher(message.substring(95, message.length()));
+							if (m.find()) {
+								voteC = m.group(0);
+								System.out.println(voteC.substring(1, voteC.length()));
+							}
+
+						} else {
+							System.out.println("PIN is incorrect");
+						}
+					} else {
+						System.out.println("You don't have the right to vote");
+					}
 				}
 
+			} catch (Exception e) {
+				System.out.println(e);
 			}
+
 		} else if (message.contains("init")) {
 			// 3rd mod
 			if (mClients.size() == 2) {

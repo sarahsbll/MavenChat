@@ -11,6 +11,9 @@ import java.net.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import java.sql.*;
+import java.util.*;
+
 public class ClientListener extends Thread {
     private ServerDispatcher mServerDispatcher;
     private ClientInfo mClientInfo;
@@ -48,23 +51,57 @@ public class ClientListener extends Thread {
                         System.out.println("NIN :");
                         nin = message.substring(11, 29);
                         System.out.println(nin);
+
+                        // NIN verification
+
                         System.out.println("PIN :");
-                        pin = message.substring(30, 95);
+                        pin = message.substring(30, 94);
                         System.out.println(pin); // length of PIN is 65
-                        System.out.println("Vote chiffré :");
-                        String pattern = "(\\s)(.*)";
 
-                        // Create a Pattern object
-                        Pattern r = Pattern.compile(pattern);
+                        try {
+                            Class.forName("com.mysql.jdbc.Driver");
+                            Connection con = DriverManager.getConnection(
+                                    "jdbc:mysql://localhost:3306/dbvote2?autoReconnect=true&useSSL=false", "root",
+                                    "projetcrypto");
+                            Statement stmt = con.createStatement();
+                            ResultSet rs;
+                            String query;
 
-                        // Now create matcher object.
-                        Matcher m = r.matcher(message.substring(95, message.length()));
-                        if (m.find()) {
-                            voteC = m.group(0);
-                            voteaD = voteC.substring(1, voteC.length());
-                            voteD = mClientInfo.mEncrption.decrypt(voteaD);
-                            DecryptVote.setVoteD(voteD);
+                            query = "select electeur.NIN, bulletin2.PIN from electeur left join bulletin2 on electeur.id = bulletin2.id;";
+                            rs = stmt.executeQuery(query);
+                            while (rs.next()) {
+                                String NIN = (rs.getString("NIN"));
+                                System.out.println(NIN);
+                                String PIN = (rs.getString("PIN"));
+                                System.out.println(PIN);
+                                if (nin.equals(NIN)) {
+                                    if (pin.equals(PIN)) {
+                                        System.out.println("Vote chiffré :");
+                                        String pattern = "(\\s)(.*)";
+
+                                        // Create a Pattern object
+                                        Pattern r = Pattern.compile(pattern);
+
+                                        // Now create matcher object.
+                                        Matcher m = r.matcher(message.substring(95, message.length()));
+                                        if (m.find()) {
+                                            voteC = m.group(0);
+                                            voteaD = voteC.substring(1, voteC.length());
+                                            voteD = mClientInfo.mEncrption.decrypt(voteaD);
+                                            DecryptVote.setVoteD(voteD);
+                                        }
+                                    } else {
+                                        System.out.println("PIN is incorrect");
+                                    }
+                                } else {
+                                    System.out.println("You don't have the right to vote");
+                                }
+                            }
+
+                        } catch (Exception e) {
+                            System.out.println(e);
                         }
+
                     }
                     System.out.println("\t(Decrypted from cipher text: " + ciphertext + ")");
                 } catch (ErrorException err) {
