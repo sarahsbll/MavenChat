@@ -4,6 +4,7 @@ import java.sql.*;
 import java.util.*;
 
 public class Decompte {
+
     public static ArrayList<HashMap[]> compteVote() {
         /*
          * Recupere les candidats et les affecte dans la case correspondante a la wilaya
@@ -93,6 +94,9 @@ public class Decompte {
                     while (!found & j < 5) {
                         map = popol.get(i)[j];
                         for (Map.Entry<Integer, Integer> entry : map.entrySet()) {
+
+                            // rs.getBlob (or getVarChar) -> decrypt after shamir with private key
+
                             if (entry.getKey() == rs.getInt("Vote")) {
                                 map.merge(rs.getInt("Vote"), 1, Integer::sum);
                                 found = true;
@@ -365,4 +369,5 @@ public class Decompte {
         }
 
     }
+
 }

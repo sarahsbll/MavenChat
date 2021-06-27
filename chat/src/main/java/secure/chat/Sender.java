@@ -38,40 +38,12 @@ public class Sender extends Thread {
 		String message = null;
 		String ciphertext = null;
 		try {
-			Help.prevote(mAlias);
-
+			Help.greeting(mAlias);
 			BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
 			while (!isInterrupted()) {
 				// read input from keyboard
 				message = in.readLine();
-
-				if (message.contains("send")) {
-					try {
-						// encrypt the input plaintext into ciphertext
-						ciphertext = mCov.encrypt(mySharedKey);
-						System.out.println("\t(Encrypted shared key: " + ciphertext + ")");
-					} catch (ErrorException fail) {
-						System.err.println(fail);
-						System.exit(-1);
-					}
-
-					// send the ciphertext to chat server through the socket
-					mOut.println(ciphertext);
-					mOut.flush();
-				} else if (message.contains("nin")) {
-					try {
-						// encrypt the input plaintext into ciphertext
-						ciphertext = mCov.encrypt(message);
-						System.out.println("\t(Encrypted into cipher text: " + ciphertext + ")");
-					} catch (ErrorException fail) {
-						System.err.println(fail);
-						System.exit(-1);
-					}
-					// send the ciphertext to chat server through the socket
-					mOut.println(ciphertext);
-					mOut.flush();
-
-				} else if (message.contains("bulletin")) {
+				if (message.contains("bulletin")) {
 					try {
 						String pin;
 						String vote = "";
@@ -79,10 +51,10 @@ public class Sender extends Thread {
 						String bulletin = "";
 
 						System.out.println("PIN :");
-						pin = message.substring(11, 75);
+						pin = message.substring(11, 76);
 						System.out.println(pin); // length of PIN is 65
 						System.out.println("Candidat :");
-						String pattern = "(\\d+)";
+						String pattern = "(\\d.*)";
 
 						// Create a Pattern object
 						Pattern r = Pattern.compile(pattern);
@@ -95,7 +67,7 @@ public class Sender extends Thread {
 							voteC = mCov.encrypt(vote);
 							System.out.println("Vote chiffré :");
 							System.out.println(voteC);
-							bulletin = "bulletin " + pin + " " + voteC;
+							bulletin = "bulletin : " + pin + " " + voteC;
 							ciphertext = mCov.encrypt(bulletin);
 						}
 						// encrypt the input plaintext into ciphertext
@@ -104,6 +76,19 @@ public class Sender extends Thread {
 						System.err.println(fail);
 						System.exit(-1);
 					}
+					// send the ciphertext to chat server through the socket
+					mOut.println(ciphertext);
+					mOut.flush();
+				} else if (message.contains("send")) {
+					try {
+						// encrypt the input plaintext into ciphertext
+						ciphertext = mCov.encrypt(mySharedKey);
+						System.out.println("\t(Encrypted shared key: " + ciphertext + ")");
+					} catch (ErrorException fail) {
+						System.err.println(fail);
+						System.exit(-1);
+					}
+
 					// send the ciphertext to chat server through the socket
 					mOut.println(ciphertext);
 					mOut.flush();

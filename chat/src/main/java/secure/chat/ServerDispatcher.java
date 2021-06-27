@@ -1,10 +1,5 @@
 package secure.chat;
 
-import java.sql.*;
-import java.util.*;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 /**
  * Nakov Chat Server
  * (c) Svetlin Nakov, 2002
@@ -19,7 +14,11 @@ import java.nio.charset.StandardCharsets;
 import java.security.*;
 import java.util.*;
 
-// 1st mod
+import java.sql.*;
+import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import com.codahale.shamir.Scheme;
 
 public class ServerDispatcher extends Thread {
@@ -35,7 +34,6 @@ public class ServerDispatcher extends Thread {
 	private KeyExchange myKey;
 	private KeyStore myKeyStore;
 	private String myAlias;
-	int Id = 0;
 
 	int numberOfClients = 2;
 	int threshold = 2;
@@ -50,13 +48,12 @@ public class ServerDispatcher extends Thread {
 
 	private static Vector<String> mMessageQueue = new Vector<String>();
 	private static HashMap<String, ClientInfo> mClients = new HashMap<String, ClientInfo>(); // Hashmap <alias,
-	// ClientInfo>
+																								// ClientInfo>
 
 	/**
 	 * Adds given client to the server's client list.
 	 */
 	public synchronized void addClient(ClientInfo aClientInfo) {
-		// DecryptVote.cClient(aClientInfo);
 		mClients.put(aClientInfo.mAlias, aClientInfo);
 	}
 
@@ -122,16 +119,6 @@ public class ServerDispatcher extends Thread {
 		return parts;
 	}
 
-	private synchronized void comm(String msg) {
-		int clients = 1;
-
-		for (Map.Entry<String, ClientInfo> entry : mClients.entrySet()) {
-			ClientInfo clientInfo = entry.getValue();
-			clientInfo.mClientSender.sendMessage(msg);
-			clients++;
-		}
-	}
-
 	/**
 	 * Sends given message to all clients in the client list. Actually the message
 	 * is added to the client sender thread's message queue and this client sender
@@ -141,61 +128,15 @@ public class ServerDispatcher extends Thread {
 	 */
 	private synchronized void sendMessageToClients(String message) {
 
-		// move this
-		// String[] getSender = message.split("/");
-		// String senderAlias = getSender[0];
-		// message = getSender[1];
-		if (message.contains("nin")) {
-			String nin = "";
-			String pattern = "(\\d.*)";
-
-			// Create a Pattern object
-			Pattern r = Pattern.compile(pattern);
-
-			// Now create matcher object.
-			Matcher m = r.matcher(message.substring(5, message.length()));
-			if (m.find()) {
-				nin = m.group(0);
-				System.out.println(nin);
-				try {
-					Class.forName("com.mysql.jdbc.Driver");
-					Connection con = DriverManager.getConnection(
-							"jdbc:mysql://localhost:3306/dbvote2?autoReconnect=true&useSSL=false", "root",
-							"projetcrypto");
-					Statement stmt = con.createStatement();
-					ResultSet rs;
-					String query;
-
-					query = "select electeur.NIN from  electeur";
-					rs = stmt.executeQuery(query);
-					while (rs.next()) {
-						String NIN = (rs.getString("NIN"));
-						System.out.println(NIN);
-						if (nin.equals(NIN)) {
-							// call help greeting function
-							comm("com 1");
-							// Help.voting();
-
-						} else { // add a case for invalid NIN (less than length or input of type require)
-							System.out.println("You don't have the right to vote");
-						}
-					}
-				} catch (Exception e) {
-					System.out.println(e);
-				}
-			} else {
-				System.out.println("NO MATCH");
-			}
-
-		} else if (message.contains("bulletin")) {
+		if (message.contains("bulletin")) {
 			// insert in BDD
-			System.out.println("\t(Le bulletin a été reçu : " + message + ")");
+			System.out.println("\t(Bulletin reçu : " + message + ")");
 
 			String pin;
 			String voteC;
 
 			System.out.println("PIN :");
-			pin = message.substring(9, 73);
+			pin = message.substring(11, 76);
 			System.out.println(pin); // length of PIN is 65
 			System.out.println("Vote chiffré :");
 			String pattern = "(\\s)(.*)";
@@ -204,7 +145,7 @@ public class ServerDispatcher extends Thread {
 			Pattern r = Pattern.compile(pattern);
 
 			// Now create matcher object.
-			Matcher m = r.matcher(message.substring(73, message.length()));
+			Matcher m = r.matcher(message.substring(76, message.length()));
 			if (m.find()) {
 				voteC = m.group(0);
 				System.out.println(voteC.substring(1, voteC.length()));
@@ -217,22 +158,15 @@ public class ServerDispatcher extends Thread {
 					PreparedStatement preparedstmt;
 					query = " insert into bulletin2 (PIN, Vote)" + " values (?, ?)";
 					preparedstmt = con.prepareStatement(query);
-					// Id = 1;
-					// preparedstmt.setInt(1, Id);
 					preparedstmt.setString(1, pin);
 					preparedstmt.setString(2, voteC.substring(1, voteC.length()));
-					// Id = Id + 1;
 					preparedstmt.executeUpdate();
 					System.out.println("Le bulletin a été ajouté");
-					// call help
-					comm("com 2");
-					// Help.postvote();
-
 				} catch (Exception e) {
 					System.out.println(e);
 				}
-			}
 
+			}
 		} else if (message.contains("init")) {
 			// 3rd mod
 			if (mClients.size() == 2) {
@@ -265,7 +199,9 @@ public class ServerDispatcher extends Thread {
 		} else {
 			// message in wrong format, send back to sender
 			String newMsg = ":err MESSAGE IS NOT IN \"To receiver's alias: message\" FORMAT! PLEASE REDO!";
-
+			// String receiverAlias = senderAlias;
+			// ClientInfo receiver = mClients.get(receiverAlias);
+			// receiver.mClientSender.sendMessage(newMsg);
 		}
 	}
 
@@ -288,6 +224,7 @@ public class ServerDispatcher extends Thread {
 
 					// Example of decrypted vote
 					DecryptVote.DecryptV();
+
 					// Procede to Tally
 					/*
 					 * On a ici 5 wilaya ayant chacune 5 listes electorales (donc 5 partis, chaque
@@ -317,7 +254,6 @@ public class ServerDispatcher extends Thread {
 					voteListe = Decompte.UpdateNbvoteListe(popol);
 					Decompte.AssignerSiege(voteListe, popol);
 				}
-
 			}
 		} catch (InterruptedException e) {
 			System.err.print(e);
@@ -484,8 +420,6 @@ public class ServerDispatcher extends Thread {
 		try {
 			// initialize Encryption object
 			aClientInfo.mEncrption = new Encryption(myKey.getSecret(), symCipher);
-			// send to Decompte from here
-			// Decompte.cDecryption(new Encryption(myKey.getSecret(), symCipher));
 			System.out.println("******************* Finish command check for " + senderIP + ":" + senderPort
 					+ " *******************");
 		} catch (ErrorException fail) {

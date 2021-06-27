@@ -13,7 +13,7 @@ public class DecryptVote {
 
     // show decrypted vote when called by serevr dispatcher;
     public static void DecryptV() {
-        System.out.println("Vote déchiffré");
+        System.out.println("Vote déchiffré :");
         System.out.println(voteD);
     }
 

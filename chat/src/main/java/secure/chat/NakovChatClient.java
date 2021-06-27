@@ -82,16 +82,9 @@ public class NakovChatClient {
 					// System.out.println(message);
 					// System.out.println("\t(Decrypted from cipher text: " + ciphertext + ")");
 
+					System.out.println(message);
 					sender.respSharedKey(message);
-					if (message.contains("com 1")) {
-						Help.voting();
-					} else if (message.contains("com 2")) {
-						Help.postvote();
-					} else {
-
-						System.out.println(message);
-						System.out.println("\t(Decrypted from cipher text: " + ciphertext + ")");
-					}
+					System.out.println("\t(Decrypted and sent to server: " + ciphertext + ")");
 
 				} catch (ErrorException err) {
 					System.err.println(err);

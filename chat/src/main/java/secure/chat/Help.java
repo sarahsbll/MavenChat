@@ -128,25 +128,12 @@ public class Help {
 	/**
 	 * display greeting message
 	 */
-	public static void prevote(String alias) {
+	public static void greeting(String alias) {
 		System.out.println("*******************************************************************************");
-		System.out.println("\t\t You've been" + " Connected Successfully");
-		// type nin pour vérifier si l a le droit de voter
-		System.out.println("\t  Enter your \"nin\" to check if you have the right to vote");
-		System.out.println("*******************************************************************************");
-	}
-
-	// après que l'électeur est accepté, on lui affiche !!
-	public static void voting() {
-		System.out.println("*******************************************************************************");
-		System.out.println("\t  Type \"bulletin\" then enter your pin and choosen candidat");
-		System.out.println("*******************************************************************************");
-	}
-
-	public static void postvote() {
-		System.out.println("*******************************************************************************");
-		System.out.println("\t1. Type \"init\" to initiate secret sharing");
-		System.out.println("\t2. Type \"send\" to recover original secret");
+		System.out.println("\t\t Party" + " Connected Successfully");
+		System.out.println("\t1. Type \"bulletin\" then enter your nin, pin and choosen candidat");
+		System.out.println("\t2. Type \"init\" to initiate secret sharing");
+		System.out.println("\t3. Type \"send\" to recover original secret");
 		System.out.println("*******************************************************************************");
 	}
 

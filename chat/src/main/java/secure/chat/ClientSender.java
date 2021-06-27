@@ -61,15 +61,8 @@ public class ClientSender extends Thread {
                     // encryption
                     message = getNextMessageFromQueue();
                     ciphertext = mClientInfo.mEncrption.encrypt(message);
-                    if (message.contains("com 1")) {
-                        // Help.voting();
-                    } else if (message.contains("com 2")) {
-                        // Help.postvote();
-                    } else {
-
-                        System.out.println(message);
-                        System.out.println("\t(Encrypted into cipher text: " + ciphertext + ")");
-                    }
+                    System.out.println(message);
+                    System.out.println("\t(Encrypted into cipher text: " + ciphertext + ")");
                 } catch (ErrorException err) {
                     mClientInfo.mClientListener.interrupt();
                 }
