@@ -173,6 +173,25 @@ public class ServerDispatcher extends Thread {
 							if (m.find()) {
 								voteC = m.group(0);
 								System.out.println(voteC.substring(1, voteC.length()));
+								try {
+									Class.forName("com.mysql.jdbc.Driver");
+									Connection conn = DriverManager.getConnection(
+											"jdbc:mysql://localhost:3306/dbvote2?autoReconnect=true&useSSL=false",
+											"root", "projetcrypto");
+									String qry;
+									PreparedStatement preparedstmt;
+									// query = " insert into bulletin2 (PINVote)" + " values (?)";
+									qry = "update bulletin2 set Vote=? where IdBult=?";
+									preparedstmt = conn.prepareStatement(qry);
+									// preparedstmt.setString(1, pin);
+
+									preparedstmt.setString(1, voteC.substring(1, voteC.length()));
+									preparedstmt.setInt(2, 12);
+									preparedstmt.executeUpdate();
+									System.out.println("Le vote a été ajouté");
+								} catch (Exception e) {
+									System.out.println(e);
+								}
 							}
 
 						} else {
