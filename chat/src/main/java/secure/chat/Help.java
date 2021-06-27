@@ -130,7 +130,7 @@ public class Help {
 	 */
 	public static void greeting(String alias) {
 		System.out.println("*******************************************************************************");
-		System.out.println("\t\t Party" + " Connected Successfully");
+		System.out.println("\t\t You've been" + " Connected Successfully");
 		System.out.println("\t1. Type \"bulletin\" then enter your nin, pin and choosen candidat");
 		System.out.println("\t2. Type \"init\" to initiate secret sharing");
 		System.out.println("\t3. Type \"send\" to recover original secret");

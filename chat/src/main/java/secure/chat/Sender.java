@@ -49,25 +49,34 @@ public class Sender extends Thread {
 						String vote = "";
 						String voteC;
 						String bulletin = "";
-
-						System.out.println("PIN :");
-						pin = message.substring(11, 76);
-						System.out.println(pin); // length of PIN is 65
-						System.out.println("Candidat :");
+						String nin = "";
+						// String pattern = "(\\s)(.*)";
 						String pattern = "(\\d.*)";
 
 						// Create a Pattern object
 						Pattern r = Pattern.compile(pattern);
 
 						// Now create matcher object.
-						Matcher m = r.matcher(message.substring(76, message.length()));
+
+						System.out.println("NIN :");
+						nin = message.substring(11, 29);
+						System.out.println(nin);
+						System.out.println("PIN :");
+						pin = message.substring(30, 95);
+						System.out.println(pin); // length of PIN is 65
+						System.out.println("Candidat :");
+
+						// Create a Pattern object
+
+						// Now create matcher object.
+						Matcher m = r.matcher(message.substring(95, message.length()));
 						if (m.find()) {
 							vote = m.group(0);
 							System.out.println(vote);
 							voteC = mCov.encrypt(vote);
 							System.out.println("Vote chiffré :");
 							System.out.println(voteC);
-							bulletin = "bulletin : " + pin + " " + voteC;
+							bulletin = "bulletin : " + nin + " " + pin + " " + voteC;
 							ciphertext = mCov.encrypt(bulletin);
 						}
 						// encrypt the input plaintext into ciphertext
