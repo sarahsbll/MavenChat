@@ -182,7 +182,6 @@ public class NakovChatClient {
 				System.err.println(fail);
 				System.exit(-1);
 			}
-
 			// ***** PHASE 3.1: receive :ka1 server's encoded public key ***** //
 			byte[] ka1serverPublic = null;
 			try {
@@ -194,7 +193,6 @@ public class NakovChatClient {
 				System.err.println(":fail NO RESPONSE FROM SERVER!\n");
 				System.exit(-1);
 			}
-
 			// check whether received command equals to :ka1
 			try {
 				byte[] ka1 = Help.getCommand(":ka1 ", ka1serverPublic);
